@@ -1,0 +1,124 @@
+{
+  "info": {
+    "name": "Helfy Task API",
+    "_postman_id": "c7e81d90-001a-4e5c-bdc2-b4c2adf75c11",
+    "description": "Collection for testing all Task Manager API endpoints (Express.js server on port 4000)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["health"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Tasks",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/api/tasks",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["api", "tasks"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Task",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Buy groceries\",\n  \"description\": \"Milk, bread, and eggs\",\n  \"priority\": \"medium\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/api/tasks",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["api", "tasks"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Task",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Buy groceries and snacks\",\n  \"priority\": \"high\",\n  \"completed\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/api/tasks/{{taskId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["api", "tasks", "{{taskId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Toggle Completion",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/api/tasks/{{taskId}}/toggle",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["api", "tasks", "{{taskId}}", "toggle"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Task",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/api/tasks/{{taskId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["api", "tasks", "{{taskId}}"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "taskId",
+      "value": "replace-with-task-id"
+    }
+  ]
+}
