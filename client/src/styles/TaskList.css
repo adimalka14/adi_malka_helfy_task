@@ -1,0 +1,44 @@
+.carousel-frame {
+    max-width: clamp(36rem, 90vw, 72rem);
+    margin-inline: auto;
+}
+
+.carousel-viewport {
+    width: 100%;
+    overflow: hidden;
+}
+
+.carousel-track {
+    display: flex;
+    gap: var(--gap, 1rem);
+    padding-block: 0.5rem;
+}
+
+.carousel-viewport.is-loop .carousel-track {
+    animation: carousel-scroll var(--duration, 20s) linear infinite;
+    will-change: transform;
+}
+
+.carousel-viewport.no-loop .carousel-track {
+    justify-content: center;
+}
+
+@keyframes carousel-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.carousel-viewport.pause-on-hover.is-loop:hover .carousel-track,
+.carousel-viewport.is-loop:focus-within .carousel-track {
+    animation-play-state: paused;
+}
+
+.carousel-empty {
+    color: #6b7280;
+    padding: 0.75rem;
+    text-align: center;
+}

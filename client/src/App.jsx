@@ -1,0 +1,93 @@
+import {useEffect, useState} from 'react';
+import {getTasks, createTask, updateTask, toggleTask, deleteTask} from './services/api';
+import {TaskList, TaskForm, TaskFilter} from './components';
+
+export default function App() {
+    const [tasks, setTasks] = useState([]);
+    const [filter, setFilter] = useState('all');
+    const [editingTask, setEditingTask] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+
+    useEffect(() => {
+        (async () => setTasks(await getTasks() ?? []))();
+    }, []);
+
+    const visibleTasks = tasks.filter(t => filter === 'completed' ? t.completed : filter === 'pending' ? !t.completed : true);
+
+    async function handleCreate(values) {
+        const created = await createTask(values);
+        setTasks(prev => [created, ...prev]);
+        setShowForm(false);
+    }
+
+    async function handleSave(values) {
+        const updated = await updateTask(editingTask.id, values);
+        setTasks(prev => prev.map(t => t.id === editingTask.id ? updated : t));
+        setEditingTask(null);
+        setShowForm(false);
+    }
+
+    async function handleDelete(id) {
+        await deleteTask(id);
+        setTasks(prev => prev.filter(t => t.id !== id));
+        setEditingTask(null);
+        setShowForm(false);
+    }
+
+    async function handleToggle(id) {
+        const updated = await toggleTask(id);
+        setTasks(prev => prev.map(t => t.id === id ? updated : t));
+    }
+
+    return (
+        <>
+            <h1>Task Manager</h1>
+            {showForm && !editingTask && (
+                <TaskForm
+                    mode="create"
+                    onSubmit={handleCreate}
+                    onCancel={() => setShowForm(false)}
+                />
+            )}
+
+            {editingTask && (
+                <TaskForm
+                    mode="edit"
+                    taskId={editingTask?.id}
+                    initialValues={{
+                        title: editingTask.title,
+                        description: editingTask.description,
+                        priority: editingTask.priority,
+                    }}
+                    onSubmit={handleSave}
+                    onCancel={() => {
+                        setEditingTask(null);
+                        setShowForm(false);
+                    }}
+                    onDelete={handleDelete}
+                />
+            )}
+            {!showForm &&
+                <>
+                    <div style={{display: 'flex', gap: 8}}>
+                        <button onClick={() => {
+                            setShowForm(true);
+                            setEditingTask(null);
+                        }}>+ New Task
+                        </button>
+                    </div>
+                    <TaskFilter filter={filter} setFilter={setFilter}/>
+                    <TaskList
+                        tasks={visibleTasks}
+                        onToggle={handleToggle}
+                        onEdit={(task) => {
+                            console.log('Edit task', task);
+                            setEditingTask(task);
+                            setShowForm(true);
+                        }}
+                    />
+                </>
+            }
+        </>
+    );
+}

@@ -1,0 +1,76 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 0.6rem;
+    padding: 0.8rem;
+    background: #fff;
+    width: 10em;
+    height: 10em;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
+}
+
+.dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: #10b981;
+}
+.dot.high { background: #ef4444; }
+.dot.medium { background: #f59e0b; }
+.dot.low { background: #10b981; }
+
+.desc {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin: 0.4rem 0;
+    line-height: 1.4;
+}
+
+.done .title {
+    text-decoration: line-through;
+    color: #6b7280;
+}
+
+.actions {
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+button {
+    border: 1px solid #d1d5db;
+    background: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+button:hover {
+    background: #f9fafb;
+}
+
+button.danger:hover {
+    background: #fef2f2;
+}
+
+@media (max-width: 600px) {
+
+}
