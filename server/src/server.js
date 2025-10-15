@@ -1,7 +1,7 @@
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import { PORT, ALLOWED_ORIGINS } from './config/env.config.js';
+import { PORT, ALLOWED_ORIGINS, NODE_ENV, SEED } from './config/env.config.js';
 import apiRouter from "./routes/api.routes.js";
 import { seedDemo } from './services/tasks.service.js';
 
@@ -21,7 +21,7 @@ app.get('/health', (req, res) => {
   res.send('OK');
 });
 
-if (process.env.NODE_ENV !== 'production' && process.env.SEED === 'true') {
+if (NODE_ENV !== 'production' && SEED) {
   seedDemo();
   console.log('Seeded demo tasks');
 }
