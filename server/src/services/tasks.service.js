@@ -3,6 +3,17 @@ import { StatusCodes } from 'http-status-codes';
 
 const tasks = [];
 
+export function seedDemo(count = 12) {
+    const priorities = ['low','medium','high'];
+    for (let i = 1; i <= count; i++) {
+        create({
+            title: `Task #${i}`,
+            description: `Demo task number ${i}`,
+            priority: priorities[i % priorities.length]
+        });
+    }
+}
+
 export function findAll() {
     return tasks;
 }
