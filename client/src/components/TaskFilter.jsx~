@@ -1,0 +1,18 @@
+import PropTypes from "prop-types";
+
+export default function TaskFilter(filter, setFilter) {
+    const handleSetFilter = (newFilter) => () => setFilter(newFilter)
+
+    return (
+        <div style={{display: 'flex', gap: 8, marginBottom: 12}}>
+            <button onClick={handleSetFilter('all')} aria-pressed={filter === 'all'}>All</button>
+            <button onClick={handleSetFilter('completed')} aria-pressed={filter === 'completed'}>Completed</button>
+            <button onClick={handleSetFilter('pending')} aria-pressed={filter === 'pending'}>Pending</button>
+        </div>
+    );
+}
+
+TaskFilter.propTypes = {
+    setFilter: PropTypes.func.isRequired,
+    filter: PropTypes.oneOf(['all', 'completed', 'pending']).isRequired,
+};
