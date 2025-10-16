@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react';
-import {getTasks, createTask, updateTask, toggleTask, deleteTask} from './services/api';
-import {TaskList, TaskForm, TaskFilter} from './components';
+import { useEffect, useState } from 'react';
+import { getTasks, createTask, updateTask, toggleTask, deleteTask } from './services/api';
+import { TaskList, TaskForm, TaskFilter } from './components';
 
 export default function App() {
     const [tasks, setTasks] = useState([]);
@@ -9,45 +9,43 @@ export default function App() {
     const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
-        (async () => setTasks(await getTasks() ?? []))();
+        (async () => setTasks((await getTasks()) ?? []))();
     }, []);
 
-    const visibleTasks = tasks.filter(t => filter === 'completed' ? t.completed : filter === 'pending' ? !t.completed : true);
+    const visibleTasks = tasks.filter((t) =>
+        filter === 'completed' ? t.completed : filter === 'pending' ? !t.completed : true
+    );
 
     async function handleCreate(values) {
         const created = await createTask(values);
-        setTasks(prev => [created, ...prev]);
+        setTasks((prev) => [created, ...prev]);
         setShowForm(false);
     }
 
     async function handleSave(values) {
         const updated = await updateTask(editingTask.id, values);
-        setTasks(prev => prev.map(t => t.id === editingTask.id ? updated : t));
+        setTasks((prev) => prev.map((t) => (t.id === editingTask.id ? updated : t)));
         setEditingTask(null);
         setShowForm(false);
     }
 
     async function handleDelete(id) {
         await deleteTask(id);
-        setTasks(prev => prev.filter(t => t.id !== id));
+        setTasks((prev) => prev.filter((t) => t.id !== id));
         setEditingTask(null);
         setShowForm(false);
     }
 
     async function handleToggle(id) {
         const updated = await toggleTask(id);
-        setTasks(prev => prev.map(t => t.id === id ? updated : t));
+        setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
     }
 
     return (
         <>
             <h1>Task Manager</h1>
             {showForm && !editingTask && (
-                <TaskForm
-                    mode="create"
-                    onSubmit={handleCreate}
-                    onCancel={() => setShowForm(false)}
-                />
+                <TaskForm mode="create" onSubmit={handleCreate} onCancel={() => setShowForm(false)} />
             )}
 
             {editingTask && (
@@ -67,16 +65,19 @@ export default function App() {
                     onDelete={handleDelete}
                 />
             )}
-            {!showForm &&
+            {!showForm && (
                 <>
-                    <div style={{display: 'flex', gap: 8}}>
-                        <button onClick={() => {
-                            setShowForm(true);
-                            setEditingTask(null);
-                        }}>+ New Task
+                    <div style={{ display: 'flex', gap: 8 }}>
+                        <button
+                            onClick={() => {
+                                setShowForm(true);
+                                setEditingTask(null);
+                            }}
+                        >
+                            + New Task
                         </button>
                     </div>
-                    <TaskFilter filter={filter} setFilter={setFilter}/>
+                    <TaskFilter filter={filter} setFilter={setFilter} />
                     <TaskList
                         tasks={visibleTasks}
                         onToggle={handleToggle}
@@ -85,9 +86,10 @@ export default function App() {
                             setEditingTask(task);
                             setShowForm(true);
                         }}
+                        visibleCount={5}
                     />
                 </>
-            }
+            )}
         </>
     );
 }

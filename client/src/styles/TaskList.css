@@ -1,40 +1,62 @@
-.carousel-frame {
+.slide-frame {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
     max-width: clamp(36rem, 90vw, 72rem);
     margin-inline: auto;
 }
 
-.carousel-viewport {
-    width: 100%;
+.slide-nav {
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 999px;
+    width: 2.2rem;
+    height: 2.2rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+}
+
+.slide-nav:hover {
+    background: #f9fafb;
+}
+
+.slide-viewport {
+    position: relative;
     overflow: hidden;
 }
 
-.carousel-track {
+.slide-track {
     display: flex;
-    gap: var(--gap, 1rem);
-    padding-block: 0.5rem;
-}
-
-.carousel-viewport.is-loop .carousel-track {
-    animation: carousel-scroll var(--duration, 20s) linear infinite;
     will-change: transform;
 }
 
-.carousel-viewport.no-loop .carousel-track {
-    justify-content: center;
+.slide-track.animate {
+    transition: transform var(--tr-ms, 450ms) ease;
 }
 
-@keyframes carousel-scroll {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-50%);
-    }
+.slide-track.no-animate {
+    transition: none;
 }
 
-.carousel-viewport.pause-on-hover.is-loop:hover .carousel-track,
-.carousel-viewport.is-loop:focus-within .carousel-track {
-    animation-play-state: paused;
+.slide {
+    box-sizing: border-box;
+    flex: 0 0 calc(100% / var(--slots, 3));
+    display: grid;
+    place-items: center;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.slide-track.static {
+    display: grid;
+    grid-template-columns: repeat(var(--slots, 3), 1fr);
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    transition: none;
 }
 
 .carousel-empty {

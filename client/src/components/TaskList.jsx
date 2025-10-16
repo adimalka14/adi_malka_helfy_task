@@ -1,38 +1,161 @@
-import PropTypes from "prop-types";
-import '../styles/TaskList.css';
+import { useEffect, useState, useRef } from 'react';
+import PropTypes from 'prop-types';
+
 import TaskItem from './TaskItem';
+import '../styles/TaskList.css';
 
 export default function TaskList({
-                                     tasks,
-                                     onToggle,
-                                     onEdit,
-                                     durationSec = 20,
-                                     gapRem = 1,
-                                     pauseOnHover = true,
-                                     minToLoop = 4,
-                                 }) {
-    if (!tasks?.length) return <div className="carousel-empty">No tasks yet.</div>;
+    tasks,
+    onToggle,
+    onEdit,
+    visibleCount = 3,
+    transitionMs = 450,
+}) {
+    const len = Array.isArray(tasks) ? tasks.length : 0;
+    if (!len) return <div className="carousel-empty">No tasks yet.</div>;
 
-    const loop = tasks.length >= minToLoop;
-    const content = loop ? [...tasks, ...tasks] : tasks;
+    const k =
+        visibleCount === 3 || visibleCount === 5 || visibleCount === 7
+            ? visibleCount
+            : 3;
+    const center = (k - 1) / 2;
+    const isStatic = len < k;
 
-    return (
-        <div className="carousel-frame">
-            <div
-                className={`carousel-viewport ${loop ? 'is-loop' : 'no-loop'}${pauseOnHover ? ' pause-on-hover' : ''}`}
-                style={{'--gap': `${gapRem}rem`, '--duration': `${durationSec}s`}}
-            >
-                <div className="carousel-track">
-                    {content.map((t, i) => (
-                        <TaskItem
-                            key={`${t.id}-${i}`}
-                            task={t}
-                            onToggle={onToggle}
-                            onEdit={onEdit}
-                        />
-                    ))}
+    if (isStatic) {
+        return (
+            <div className="slide-frame">
+                <div className="slide-viewport">
+                    <div
+                        className="slide-track static"
+                        style={{ '--slots': len }}
+                    >
+                        {tasks.map((t) => (
+                            <div className="slide" key={t.id}>
+                                <TaskItem
+                                    task={t}
+                                    onToggle={onToggle}
+                                    onEdit={onEdit}
+                                />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
+        );
+    }
+
+    const head = tasks.slice(-k);
+    const tail = tasks.slice(0, k);
+    const slides = [...head, ...tasks, ...tail]; // length = len + 2k
+
+    const base = k;
+    const [cur, setCur] = useState(base);
+    const [anim, setAnim] = useState(true);
+
+    const trackRef = useRef(null);
+    const viewportRef = useRef(null);
+    const [slideW, setSlideW] = useState(0);
+
+    useEffect(() => {
+        function measure() {
+            const vp = viewportRef.current;
+            if (!vp) return;
+            const w = vp.clientWidth / k;
+            setSlideW(w);
+        }
+
+        measure();
+        const ro = new ResizeObserver(measure);
+        if (viewportRef.current) ro.observe(viewportRef.current);
+        window.addEventListener('orientationchange', measure);
+        return () => {
+            ro.disconnect();
+            window.removeEventListener('orientationchange', measure);
+        };
+    }, [k]);
+
+    useEffect(() => {
+        const el = trackRef.current;
+        if (!el) return;
+
+        function onEnd(e) {
+            if (!anim) return;
+            if (cur >= base + len) {
+                setAnim(false);
+                setCur((c) => c - len);
+            } else if (cur < base) {
+                setAnim(false);
+                setCur((c) => c + len);
+            }
+        }
+
+        el.addEventListener('transitionend', onEnd);
+        return () => el.removeEventListener('transitionend', onEnd);
+    }, [anim, cur, len, base]);
+
+    useEffect(() => {
+        if (!anim) {
+            const id = requestAnimationFrame(() => setAnim(true));
+            return () => cancelAnimationFrame(id);
+        }
+    }, [anim]);
+
+    const prev = () => setCur((c) => c - 1);
+    const next = () => setCur((c) => c + 1);
+
+    function onSlideClick(clickedIndex) {
+        setCur(clickedIndex - center);
+    }
+
+    const translatePx = -(cur * slideW);
+
+    return (
+        <div className="slide-frame" style={{ '--tr-ms': `${transitionMs}ms` }}>
+            <button
+                className="slide-nav left"
+                onClick={prev}
+                aria-label="Previous"
+            >
+                ‹
+            </button>
+
+            <div className="slide-viewport" ref={viewportRef}>
+                <div
+                    className={`slide-track ${anim ? 'animate' : 'no-animate'}`}
+                    ref={trackRef}
+                    style={{
+                        '--slots': k,
+                        transform: `translate3d(${translatePx}px, 0, 0)`,
+                    }}
+                >
+                    {slides.map((t, i) => {
+                        const isCenter = i === cur + center;
+                        return (
+                            <div
+                                className={`slide${isCenter ? ' center' : ''}`}
+                                key={`${t.id}-${i}`}
+                                onClick={() => onSlideClick(i)}
+                                role="button"
+                                tabIndex={0}
+                            >
+                                <TaskItem
+                                    task={t}
+                                    onToggle={onToggle}
+                                    onEdit={onEdit}
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            <button
+                className="slide-nav right"
+                onClick={next}
+                aria-label="Next"
+            >
+                ›
+            </button>
         </div>
     );
 }
@@ -41,8 +164,6 @@ TaskList.propTypes = {
     tasks: PropTypes.array.isRequired,
     onToggle: PropTypes.func,
     onEdit: PropTypes.func,
-    durationSec: PropTypes.number,
-    gapRem: PropTypes.number,
-    pauseOnHover: PropTypes.bool,
-    minToLoop: PropTypes.number,
+    visibleCount: PropTypes.oneOf([3, 5, 7]),
+    transitionMs: PropTypes.number,
 };
